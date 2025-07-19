@@ -120,7 +120,7 @@ fun CreateDumasScreen(
 
                     SectionTitle("Upload File")
                     Button(
-                        onClick = { filePickerLauncher.launch("*/*") }, // Allow all file types, adjust MIME type as needed
+                        onClick = { filePickerLauncher.launch("*/*") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -159,6 +159,13 @@ fun CreateDumasScreen(
                         return@Button
                     }
 
+                    if (selectedFileUri == null) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Silakan pilih file sebelum mengirim!")
+                        }
+                        return@Button
+                    }
+
                     val request = dumas(
                         id = 0,
                         judul = judul,
@@ -177,31 +184,32 @@ fun CreateDumasScreen(
                         created_by = "1"
                     )
 
-                    // Pass both the dumas request and the file URI to the ViewModel
                     coroutineScope.launch {
                         dumasViewModel.postDumas(request, selectedFileUri)
-                        snackbarHostState.showSnackbar(
-                            if (selectedFileUri != null) "Pengaduan dan file berhasil dikirim."
-                            else "Pengaduan berhasil dikirim."
-                        )
+                        if (dumasViewModel.isSuccess) {
+                            snackbarHostState.showSnackbar("Pengaduan dan file berhasil dikirim.")
+                            // Reset fields
+                            judul = ""
+                            isiPengadu = ""
+                            namaPengadu = ""
+                            nomorHpPengadu = ""
+                            emailPengadu = ""
+                            verifikasiBy = ""
+                            verifikasiAt = ""
+                            disposisiBy = ""
+                            disposisiTo = ""
+                            disposisiAt = ""
+                            tanggalAudit = ""
+                            nilaiAudit = ""
+                            keterangan = ""
+                            selectedFileUri = null
+                            selectedFileName = ""
+                        } else {
+                            snackbarHostState.showSnackbar(
+                                dumasViewModel.errorMessage ?: "Gagal mengirim pengaduan."
+                            )
+                        }
                     }
-
-                    // Reset
-                    judul = ""
-                    isiPengadu = ""
-                    namaPengadu = ""
-                    nomorHpPengadu = ""
-                    emailPengadu = ""
-                    verifikasiBy = ""
-                    verifikasiAt = ""
-                    disposisiBy = ""
-                    disposisiTo = ""
-                    disposisiAt = ""
-                    tanggalAudit = ""
-                    nilaiAudit = ""
-                    keterangan = ""
-                    selectedFileUri = null
-                    selectedFileName = ""
                 },
                 modifier = Modifier
                     .fillMaxWidth()

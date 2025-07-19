@@ -1,21 +1,23 @@
 package com.example.tareihan.dto.dumas
 
+import java.io.File
+
 data class dumas(
-    val id: Int? = null,
-    val judul: String? = null,
-    val isi_pengaduan: String? = null,
-    val nama_pengadu: String? = null,
-    val nomorhp_pengadu: String? = null,
-    val email_pengadu: String? = null,
-    val verifikasi_by: String? = null,
-    val verifikasi_at: String? = null,
-    val disposisi_at: String? = null,
-    val disposisi_by: String? = null,
-    val disposisi_to: String? = null,
-    val tanggal_audit: String? = null,
-    val keterangan: String? = null,
-    val nilai_audit: String? = null,
-    val created_by: String? = null,
-    val status: String? = null,
-    val attachments: List<String> = emptyList(),
+    val id: Int = 0,
+    val judul: String = "",
+    val isi_pengaduan: String = "",
+    val nama_pengadu: String = "",
+    val nomorhp_pengadu: String = "",
+    val email_pengadu: String = "",
+    val verifikasi_by: String = "",
+    val verifikasi_at: String = "",
+    val disposisi_by: String = "",
+    val disposisi_to: String = "",
+    val disposisi_at: String = "",
+    val tanggal_audit: String = "",
+    val nilai_audit: String = "",
+    val keterangan: String = "",
+    val created_by: String = "",
+    val file : File? = null,
+    val filePath: String? = null
 )

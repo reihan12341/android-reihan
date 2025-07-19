@@ -79,7 +79,7 @@ fun EditDumasScreen(
             tanggalAudit = dumas.tanggal_audit.orEmpty()
             keterangan = dumas.keterangan.orEmpty()
             nilaiAudit = dumas.nilai_audit.orEmpty()
-            status = dumas.status.orEmpty() // Mengambil status dari data
+//            status = dumas.status.orEmpty() // Mengambil status dari data
             isInitialized = true
         }
     }
@@ -195,25 +195,29 @@ fun EditDumasScreen(
             Button(
                 onClick = {
                     focusManager.clearFocus()
-                    val updated = dumas(
-                        id = dumas?.id,
-                        judul = judul,
-                        isi_pengaduan = isiPengaduan,
-                        nama_pengadu = namaPengadu,
-                        nomorhp_pengadu = nomorHpPengadu,
-                        email_pengadu = emailPengadu,
-                        verifikasi_by = verifikasiBy,
-                        verifikasi_at = verifikasiAt,
-                        disposisi_at = disposisiAt,
-                        disposisi_by = disposisiBy,
-                        disposisi_to = disposisiTo,
-                        tanggal_audit = tanggalAudit,
-                        keterangan = keterangan,
-                        nilai_audit = nilaiAudit,
-                        created_by = "1",
-                        status = status,
-                    )
-                    viewModel.putDumas(id, updated)
+                    val updated = dumas?.id?.let {
+                        dumas(
+                            id = it,
+                            judul = judul,
+                            isi_pengaduan = isiPengaduan,
+                            nama_pengadu = namaPengadu,
+                            nomorhp_pengadu = nomorHpPengadu,
+                            email_pengadu = emailPengadu,
+                            verifikasi_by = verifikasiBy,
+                            verifikasi_at = verifikasiAt,
+                            disposisi_at = disposisiAt,
+                            disposisi_by = disposisiBy,
+                            disposisi_to = disposisiTo,
+                            tanggal_audit = tanggalAudit,
+                            keterangan = keterangan,
+                            nilai_audit = nilaiAudit,
+                            created_by = "1",
+//                            status = status,
+                        )
+                    }
+                    if (updated != null) {
+                        viewModel.putDumas(id, updated)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

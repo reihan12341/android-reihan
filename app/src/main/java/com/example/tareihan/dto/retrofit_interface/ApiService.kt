@@ -60,8 +60,21 @@ interface ApiService {
     @Multipart
     @POST("dumas")
     suspend fun post_dumas(
-        @Part("dumas") dumas: RequestBody,
-        @Part file: MultipartBody.Part?
+        @Part("judul") judul: RequestBody,
+        @Part("isi_pengaduan") isiPengaduan: RequestBody,
+        @Part("nama_pengadu") namaPengadu: RequestBody,
+        @Part("nomorhp_pengadu") nomorhpPengadu: RequestBody,
+        @Part("email_pengadu") emailPengadu: RequestBody,
+        @Part("verifikasi_by") verifikasiBy: RequestBody,
+        @Part("verifikasi_at") verifikasiAt: RequestBody,
+        @Part("disposisi_by") disposisiBy: RequestBody,
+        @Part("disposisi_to") disposisiTo: RequestBody,
+        @Part("disposisi_at") disposisiAt: RequestBody,
+        @Part("tanggal_audit") tanggalAudit: RequestBody,
+        @Part("nilai_audit") nilaiAudit: RequestBody,
+        @Part("keterangan") keterangan: RequestBody,
+        @Part("created_by") createdBy: RequestBody,
+        @Part file: MultipartBody.Part? = null
     ): Response<DataResponse<Unit>>
 
     @PUT("dumas/{id}")
