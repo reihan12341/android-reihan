@@ -5,8 +5,12 @@ import com.example.tareihan.dto.LoginResponse.RegisterResponse
 import com.example.tareihan.dto.Schedule.ScheduleResponse
 import com.example.tareihan.dto.apiresponse.DataResponse
 import com.example.tareihan.dto.auditor.Auditor
+import com.example.tareihan.dto.auditor.auditor_response
 import com.example.tareihan.dto.disposisi_irbanda.disposisi_irbanda
 import com.example.tareihan.dto.dumas.dumas
+import com.example.tareihan.dto.dumas.update_audit_disposisi
+import com.example.tareihan.dto.dumas.update_disposisi_request
+import com.example.tareihan.dto.dumas.update_status_request
 import com.example.tareihan.dto.surat_tugas.surat_tugas
 import com.example.tareihan.dto.temuan.temuan
 import com.example.tareihan.dto.unit_kerja.unit_kerja
@@ -20,7 +24,7 @@ interface ApiService {
 
     // ----------------------- Auditor -----------------------
     @GET("auditors")
-    suspend fun get_auditor(): Response<DataResponse<List<Auditor>>>
+    suspend fun get_auditor(): Response<DataResponse<List<auditor_response>>>
 
     @POST("auditors")
     suspend fun post_auditor(@Body auditor: Auditor): Response<DataResponse<Unit>>
@@ -65,17 +69,14 @@ interface ApiService {
         @Part("nama_pengadu") namaPengadu: RequestBody,
         @Part("nomorhp_pengadu") nomorhpPengadu: RequestBody,
         @Part("email_pengadu") emailPengadu: RequestBody,
-        @Part("verifikasi_by") verifikasiBy: RequestBody,
-        @Part("verifikasi_at") verifikasiAt: RequestBody,
-        @Part("disposisi_by") disposisiBy: RequestBody,
-        @Part("disposisi_to") disposisiTo: RequestBody,
-        @Part("disposisi_at") disposisiAt: RequestBody,
-        @Part("tanggal_audit") tanggalAudit: RequestBody,
-        @Part("nilai_audit") nilaiAudit: RequestBody,
         @Part("keterangan") keterangan: RequestBody,
         @Part("created_by") createdBy: RequestBody,
         @Part file: MultipartBody.Part? = null
     ): Response<DataResponse<Unit>>
+
+
+    @PATCH("auditors/{id}/disposisi")
+    suspend fun update_status_dumas(@Path("id") id : Int,@Body updateStatusRequest: update_status_request): Response<DataResponse<Unit>>
 
     @PUT("dumas/{id}")
     suspend fun update_dumas(@Path("id") id: Int, @Body dumas: dumas): Response<DataResponse<Unit>>
@@ -96,12 +97,22 @@ interface ApiService {
     @PUT("unitkerja/{id}")
     suspend fun update_unit_kerja(@Path("id") id: String, @Body unitkerja: unit_kerja): Response<DataResponse<Unit>>
 
+    @PATCH("dumas/{id}/update_disposisi")
+    suspend fun update_disposisi(@Path("id") id: Int, @Body updateDisposisiRequest: update_disposisi_request): Response<DataResponse<Unit>>
+
+    @PATCH("dumas/{id}/update_audit")
+    suspend fun update_disposisi_audit(@Path("id") id: Int,@Body updateAuditDisposisi: update_audit_disposisi): Response<DataResponse<Unit>>
+
+
     @DELETE("unitkerja/{id}")
     suspend fun delete_unit_kerja(@Path("id") id: String): Response<DataResponse<Unit>>
 
     // ----------------------- User -----------------------
     @GET("users")
     suspend fun get_user(): Response<DataResponse<List<User>>>
+
+    @GET("profile")
+    suspend fun profile():Response<DataResponse<User>>
 
     @GET("users/{id}")
     suspend fun get_user_by_id(@Path("id") id: String): Response<DataResponse<User>>

@@ -35,14 +35,7 @@ fun EditDumasScreen(
     var namaPengadu by remember { mutableStateOf("") }
     var nomorHpPengadu by remember { mutableStateOf("") }
     var emailPengadu by remember { mutableStateOf("") }
-    var verifikasiBy by remember { mutableStateOf("") }
-    var verifikasiAt by remember { mutableStateOf("") }
-    var disposisiAt by remember { mutableStateOf("") }
-    var disposisiBy by remember { mutableStateOf("") }
-    var disposisiTo by remember { mutableStateOf("") }
-    var tanggalAudit by remember { mutableStateOf("") }
     var keterangan by remember { mutableStateOf("") }
-    var nilaiAudit by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("") }
     var isInitialized by remember { mutableStateOf(false) }
     var showSuccessSnackbar by remember { mutableStateOf(false) }
@@ -51,7 +44,6 @@ fun EditDumasScreen(
     val dumas = viewModel.dumasShow
     val isLoading = viewModel.isLoading
     val errorMessage = viewModel.errorMessage
-    val isUpdateSuccess = viewModel.dumas
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -71,15 +63,8 @@ fun EditDumasScreen(
             namaPengadu = dumas.nama_pengadu.orEmpty()
             nomorHpPengadu = dumas.nomorhp_pengadu.orEmpty()
             emailPengadu = dumas.email_pengadu.orEmpty()
-            verifikasiBy = dumas.verifikasi_by.orEmpty()
-            verifikasiAt = dumas.verifikasi_at.orEmpty()
-            disposisiAt = dumas.disposisi_at.orEmpty()
-            disposisiBy = dumas.disposisi_by.orEmpty()
-            disposisiTo = dumas.disposisi_to.orEmpty()
-            tanggalAudit = dumas.tanggal_audit.orEmpty()
             keterangan = dumas.keterangan.orEmpty()
-            nilaiAudit = dumas.nilai_audit.orEmpty()
-//            status = dumas.status.orEmpty() // Mengambil status dari data
+            // Note: Status is not part of the dumas data class; handle separately if needed
             isInitialized = true
         }
     }
@@ -132,13 +117,7 @@ fun EditDumasScreen(
                     LabeledField("Nama Pengadu", namaPengadu) { namaPengadu = it }
                     LabeledField("Nomor HP", nomorHpPengadu) { nomorHpPengadu = it }
                     LabeledField("Email", emailPengadu) { emailPengadu = it }
-
-                    SectionHeader("Verifikasi & Disposisi")
-                    LabeledField("Verifikasi Oleh", verifikasiBy) { verifikasiBy = it }
-                    LabeledField("Tanggal Verifikasi", verifikasiAt) { verifikasiAt = it }
-                    LabeledField("Disposisi Oleh", disposisiBy) { disposisiBy = it }
-                    LabeledField("Disposisi Kepada", disposisiTo) { disposisiTo = it }
-                    LabeledField("Tanggal Disposisi", disposisiAt) { disposisiAt = it }
+                    LabeledField("Keterangan", keterangan, 2) { keterangan = it }
 
                     SectionHeader("Status")
                     ExposedDropdownMenuBox(
@@ -173,11 +152,6 @@ fun EditDumasScreen(
                             }
                         }
                     }
-
-                    SectionHeader("Audit")
-                    LabeledField("Tanggal Audit", tanggalAudit) { tanggalAudit = it }
-                    LabeledField("Keterangan", keterangan, 2) { keterangan = it }
-                    LabeledField("Nilai Audit", nilaiAudit) { nilaiAudit = it }
                 }
             }
 
@@ -203,16 +177,8 @@ fun EditDumasScreen(
                             nama_pengadu = namaPengadu,
                             nomorhp_pengadu = nomorHpPengadu,
                             email_pengadu = emailPengadu,
-                            verifikasi_by = verifikasiBy,
-                            verifikasi_at = verifikasiAt,
-                            disposisi_at = disposisiAt,
-                            disposisi_by = disposisiBy,
-                            disposisi_to = disposisiTo,
-                            tanggal_audit = tanggalAudit,
                             keterangan = keterangan,
-                            nilai_audit = nilaiAudit,
-                            created_by = "1",
-//                            status = status,
+                            created_by = "1"
                         )
                     }
                     if (updated != null) {

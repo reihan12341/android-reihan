@@ -1,8 +1,12 @@
 package com.example.tareihan.ui.screens.ScheduleItem
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,105 +54,139 @@ fun ListScheduleScreen(viewModel: ScheduleViewModel = koinViewModel()) {
                 )
             }
             else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    items(schedules) { schedule ->
-                        ScheduleCard(schedule)
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-                }
+                ScheduleTable(schedules = schedules)
             }
         }
     }
 }
 
 @Composable
-fun ScheduleCard(schedule: ScheduleItem) {
-    // Format dates for better readability
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale("id", "ID"))
-    val startDate = try {
-        LocalDate.parse(schedule.start_date).format(formatter)
-    } catch (e: Exception) {
-        schedule.start_date // Fallback to raw string
-    }
-    val endDate = try {
-        LocalDate.parse(schedule.end_date).format(formatter)
-    } catch (e: Exception) {
-        schedule.end_date // Fallback to raw string
-    }
+fun ScheduleTable(schedules: List<ScheduleItem>) {
+    val scrollState = rememberScrollState()
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .horizontalScroll(scrollState)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        // Table Header
+        Row(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+                .padding(8.dp)
+        ) {
             Text(
-                text = schedule.opd,
+                text = "OPD",
+                modifier = Modifier
+                    .width(150.dp)
+                    .padding(8.dp)
+                    .semantics { contentDescription = "OPD Header" },
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { contentDescription = "Organization: ${schedule.opd}" }
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = schedule.keterangan,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.semantics { contentDescription = "Description: ${schedule.keterangan}" }
+                text = "Keterangan",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(8.dp)
+                    .semantics { contentDescription = "Description Header" },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Tanggal: $startDate - $endDate",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.semantics { contentDescription = "Date: $startDate to $endDate" }
+                text = "Tanggal",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(8.dp)
+                    .semantics { contentDescription = "Date Header" },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Tim Auditor:",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.semantics { contentDescription = "Auditor Team" }
+                text = "Tim Auditor",
+                modifier = Modifier
+                    .width(150.dp)
+                    .padding(8.dp)
+                    .semantics { contentDescription = "Auditor Team Header" },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            schedule.team.forEach { member ->
-                Text(
-                    text = "• $member",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .semantics { contentDescription = "Team member: $member" }
+        }
+
+        // Table Content
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(schedules) { schedule ->
+                ScheduleTableRow(schedule)
+                Divider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                    thickness = 1.dp
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun ListScheduleScreenPreview() {
-    val dummyScheduleList = listOf(
-        ScheduleItem(
-            opd_id = 1,
-            opd = "Dinas Kesehatan",
-            keterangan = "Mengawasi layanan kesehatan masyarakat",
-            start_date = "2023-11-01",
-            end_date = "2023-11-03",
-            team = listOf("Auditor A", "Auditor B", "Auditor C"),
-            team_ids = listOf(1, 2, 3)
-        ),
-        ScheduleItem(
-            opd_id = 2,
-            opd = "Dinas Pendidikan",
-            keterangan = "Mengevaluasi sistem pendidikan",
-            start_date = "2023-11-05",
-            end_date = "2023-11-07",
-            team = listOf("Auditor X", "Auditor Y"),
-            team_ids = listOf(4, 5)
-        )
-    )
+fun ScheduleTableRow(schedule: ScheduleItem) {
+    // Format dates for better readability
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale("id", "ID"))
+    val startDate = try {
+        LocalDate.parse(schedule.start_date).format(formatter)
+    } catch (e: Exception) {
+        schedule.start_date
+    }
+    val endDate = try {
+        LocalDate.parse(schedule.end_date).format(formatter)
+    } catch (e: Exception) {
+        schedule.end_date
+    }
 
-    ListScheduleScreen(
-        viewModel = viewModel<ScheduleViewModel>().apply {
-            // Simulate setting schedules for preview
-            _schedules.value = dummyScheduleList
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .semantics { contentDescription = "Schedule Row: ${schedule.opd}" }
+    ) {
+        Text(
+            text = schedule.opd,
+            modifier = Modifier
+                .width(150.dp)
+                .padding(8.dp)
+                .semantics { contentDescription = "Organization: ${schedule.opd}" },
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = schedule.keterangan,
+            modifier = Modifier
+                .width(200.dp)
+                .padding(8.dp)
+                .semantics { contentDescription = "Description: ${schedule.keterangan}" },
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(
+            text = "$startDate - $endDate",
+            modifier = Modifier
+                .width(200.dp)
+                .padding(8.dp)
+                .semantics { contentDescription = "Date: $startDate to $endDate" },
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Column(
+            modifier = Modifier
+                .width(150.dp)
+                .padding(8.dp)
+        ) {
+            schedule.team.forEach { member ->
+                Text(
+                    text = "• $member",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.semantics { contentDescription = "Team member: $member" }
+                )
+            }
         }
-    )
+    }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tareihan.dto.LoginResponse.LoginResponse
 import com.example.tareihan.dto.LoginResponse.RegisterResponse
+import com.example.tareihan.dto.user.User
 import com.example.tareihanh.dto.retrofit_interface.ApiService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,9 @@ class AuthViewModel(private val apiService: ApiService) : ViewModel() {
     private val _registerState = MutableStateFlow<Result<RegisterResponse>?>(null)
     val registerState: StateFlow<Result<RegisterResponse>?> = _registerState
 
-
+    private val _profileState = MutableStateFlow<Result<User>?>(null)
+    val profileState: StateFlow<Result<User>?> = _profileState
+    var user by mutableStateOf<User?>(null)
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -63,4 +66,19 @@ class AuthViewModel(private val apiService: ApiService) : ViewModel() {
         }
     }
 
+    fun profile() {
+        viewModelScope.launch {
+            try {
+                val response = apiService.profile()
+                if (response.isSuccessful && response.body() != null) {
+                    user = response.body()!!.data
+                    _profileState.value = Result.success(user) as Result<User>?
+                } else {
+                    _profileState.value = Result.failure(Exception("Gagal mengambil profil: ${response.message()}"))
+                }
+            } catch (e: Exception) {
+                _profileState.value = Result.failure(e)
+            }
+        }
+    }
 }

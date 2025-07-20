@@ -141,9 +141,9 @@ fun list_auditor(
                             colors = CardDefaults.cardColors(containerColor = Color.White)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("ID Dumas: ${auditor.id_dumas}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text("ID User: ${auditor.id_user}", fontSize = 14.sp)
-                                Text("ID Unit Kerja: ${auditor.id_unit_kerja}", fontSize = 14.sp)
+                                Text("Dumas: ${auditor.dumas}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text("User: ${auditor.user}", fontSize = 14.sp)
+                                Text("Unit Kerja: ${auditor.unitKerja}", fontSize = 14.sp)
 
                                 Spacer(modifier = Modifier.height(12.dp))
 

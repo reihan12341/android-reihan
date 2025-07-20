@@ -20,7 +20,7 @@ import com.example.tareihan.ui.screens.disposisi_irbanda.Editdisposisi_irbandaSc
 import com.example.tareihan.ui.screens.disposisi_irbanda.Listdisposisi_irbandaScreen
 import com.example.tareihan.ui.screens.dumas.CreateDumasScreen
 import com.example.tareihan.ui.screens.dumas.EditDumasScreen
-import com.example.tareihan.ui.screens.dumas.list_dumas
+import com.example.tareihan.ui.screens.dumas.ListDumasScreen
 import com.example.tareihan.ui.screens.surat_tugas.CreateSuratTugasScreen
 import com.example.tareihan.ui.screens.surat_tugas.EditSuratTugasScreen
 import com.example.tareihan.ui.screens.surat_tugas.list_surat_tugas
@@ -38,9 +38,8 @@ import com.example.tareihan.ui.screens.user.ListUserScreen
 fun AppNavigation(navController: NavController) {
     val navController = rememberNavController()
     NavHost(
-        navController = navController, startDestination = routes.regis
+        navController = navController, startDestination = routes.login
     ) {
-//        composable(Routes.login) { LoginScreen(navController) }
         composable(routes.create_auditor) {
             CreateAuditorScreen(navController)
         }
@@ -89,7 +88,7 @@ fun AppNavigation(navController: NavController) {
         }
 
         composable(routes.list_dumas) {
-            list_dumas(navController)
+            ListDumasScreen(navController)
         }
 
         composable(
@@ -147,9 +146,6 @@ fun AppNavigation(navController: NavController) {
             CreateDumasScreen(navController)
         }
 
-        composable(routes.list_dumas) {
-            list_dumas(navController)
-        }
         composable(
             route = "edit_dumas/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -185,7 +181,6 @@ fun AppNavigation(navController: NavController) {
             LoginScreen(navController)
         }
 
-//        composable(routes.list) { LoginScreen(navController) }
         composable(routes.list_Scheduleltem) {
             ListScheduleScreen()
         }

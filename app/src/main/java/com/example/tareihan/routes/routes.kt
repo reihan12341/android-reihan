@@ -28,6 +28,4 @@ object routes{
     const val list_Scheduleltem = "Scheduleltem"
 
 
-
-
 }

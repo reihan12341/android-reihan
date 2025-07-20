@@ -1,6 +1,7 @@
 package com.example.tareihanh.di
 
 import android.content.Context
+import com.example.tareihan.di.env
 import com.example.tareihan.dto.authinterceptor.AuthInterceptor
 import com.example.tareihan.dto.datastore.DataStoreManager
 import com.example.tareihan.ui.screens.ScheduleItem.ScheduleViewModel
@@ -60,7 +61,7 @@ val appModule = module {
             .create()
 
         Retrofit.Builder()
-            .baseUrl("https://pengaduaninspektoratmusirawas.site/api/")// pastikan valid
+            .baseUrl("${env.url}/api/")// pastikan valid
             .client(get())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -39,7 +37,7 @@ data class MenuItem(
 val menuItems = listOf(
     MenuItem("Auditor", R.drawable.auditor, routes.list_auditor),
     MenuItem("Surat Tugas", R.drawable.auditor, routes.list_surat_tugas),
-    MenuItem("Schedule", R.drawable.temuan, routes.list_temuan),
+    MenuItem("Schedule", R.drawable.temuan, routes.list_Scheduleltem),
     MenuItem("Dumas", R.drawable.dumas_foto, routes.list_dumas, allowedRoles = listOf("masyarakat", "admin", "auditor")),
     MenuItem("Temuan", R.drawable.temuan, routes.list_temuan),
     MenuItem("Unit Kerja", R.drawable.unit_kerja, routes.list_unit_keja),
@@ -209,7 +207,7 @@ private fun StatsHeaderCard() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Ringkasan Hari Ini",
+                text = "Selamat Datang",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -222,32 +220,19 @@ private fun StatsHeaderCard() {
             ) {
                 Column {
                     Text(
-                        text = "Audit",
+                        text = "Audit Pengaduan",
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF48BB78)
                         )
                     )
                     Text(
-                        text = "Total Audit",
+                        text = "Apps",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFF718096)
                     )
                 }
-                Column {
-                    Text(
-                        text = "0",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4A90E2)
-                        )
-                    )
-                    Text(
-                        text = "Total Users",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF718096)
-                    )
-                }
+
             }
         }
     }
@@ -354,21 +339,5 @@ private fun LargeStatCard(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4, name = "Default Dashboard")
-@Composable
-fun DashboardPreview() {
-    MaterialTheme {
-        DashboardScreen(rememberNavController())
-    }
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4, name = "Masyarakat Dashboard")
-@Composable
-fun DashboardMasyarakatPreview() {
-    MaterialTheme {
-        DashboardScreen(rememberNavController())
     }
 }

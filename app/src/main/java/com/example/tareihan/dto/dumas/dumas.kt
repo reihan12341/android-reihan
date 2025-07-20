@@ -19,5 +19,6 @@ data class dumas(
     val keterangan: String = "",
     val created_by: String = "",
     val file : File? = null,
-    val filePath: String? = null
+    val status : String? = null,
+    val file_uri: String? = null
 )

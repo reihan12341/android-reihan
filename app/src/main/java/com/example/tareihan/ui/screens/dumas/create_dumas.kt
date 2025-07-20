@@ -37,13 +37,6 @@ fun CreateDumasScreen(
     var namaPengadu by remember { mutableStateOf("") }
     var nomorHpPengadu by remember { mutableStateOf("") }
     var emailPengadu by remember { mutableStateOf("") }
-    var disposisiTo by remember { mutableStateOf("") }
-    var disposisiBy by remember { mutableStateOf("") }
-    var disposisiAt by remember { mutableStateOf("") }
-    var verifikasiBy by remember { mutableStateOf("") }
-    var verifikasiAt by remember { mutableStateOf("") }
-    var tanggalAudit by remember { mutableStateOf("") }
-    var nilaiAudit by remember { mutableStateOf("") }
     var keterangan by remember { mutableStateOf("") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var selectedFileName by remember { mutableStateOf("") }
@@ -105,17 +98,6 @@ fun CreateDumasScreen(
                     LabeledTextField("Nama Pengadu", namaPengadu) { namaPengadu = it }
                     LabeledTextField("Nomor HP", nomorHpPengadu) { nomorHpPengadu = it }
                     LabeledTextField("Email", emailPengadu) { emailPengadu = it }
-
-                    SectionTitle("Verifikasi & Disposisi")
-                    LabeledTextField("Verifikasi Oleh", verifikasiBy) { verifikasiBy = it }
-                    LabeledTextField("Tanggal Verifikasi (YYYY-MM-DD)", verifikasiAt) { verifikasiAt = it }
-                    LabeledTextField("Disposisi Oleh", disposisiBy) { disposisiBy = it }
-                    LabeledTextField("Disposisi Kepada", disposisiTo) { disposisiTo = it }
-                    LabeledTextField("Tanggal Disposisi (YYYY-MM-DD)", disposisiAt) { disposisiAt = it }
-
-                    SectionTitle("Audit")
-                    LabeledTextField("Tanggal Audit (YYYY-MM-DD)", tanggalAudit) { tanggalAudit = it }
-                    LabeledTextField("Nilai Audit", nilaiAudit) { nilaiAudit = it }
                     LabeledTextField("Keterangan Tambahan", keterangan, maxLines = 2) { keterangan = it }
 
                     SectionTitle("Upload File")
@@ -147,9 +129,7 @@ fun CreateDumasScreen(
                     focusManager.clearFocus()
 
                     val fields = listOf(
-                        judul, isiPengadu, namaPengadu, nomorHpPengadu, emailPengadu,
-                        verifikasiBy, verifikasiAt, disposisiBy, disposisiTo, disposisiAt,
-                        tanggalAudit, nilaiAudit, keterangan
+                        judul, isiPengadu, namaPengadu, nomorHpPengadu, emailPengadu, keterangan
                     )
 
                     if (fields.any { it.isBlank() }) {
@@ -173,13 +153,6 @@ fun CreateDumasScreen(
                         nama_pengadu = namaPengadu,
                         nomorhp_pengadu = nomorHpPengadu,
                         email_pengadu = emailPengadu,
-                        verifikasi_by = verifikasiBy,
-                        verifikasi_at = verifikasiAt,
-                        disposisi_by = disposisiBy,
-                        disposisi_to = disposisiTo,
-                        disposisi_at = disposisiAt,
-                        tanggal_audit = tanggalAudit,
-                        nilai_audit = nilaiAudit,
                         keterangan = keterangan,
                         created_by = "1"
                     )
@@ -194,13 +167,6 @@ fun CreateDumasScreen(
                             namaPengadu = ""
                             nomorHpPengadu = ""
                             emailPengadu = ""
-                            verifikasiBy = ""
-                            verifikasiAt = ""
-                            disposisiBy = ""
-                            disposisiTo = ""
-                            disposisiAt = ""
-                            tanggalAudit = ""
-                            nilaiAudit = ""
                             keterangan = ""
                             selectedFileUri = null
                             selectedFileName = ""

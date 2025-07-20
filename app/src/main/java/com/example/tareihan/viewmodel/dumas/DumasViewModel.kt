@@ -2,6 +2,7 @@ package com.example.tareihan.viewmodel.dumas
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,16 +10,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tareihan.dto.apiresponse.DataResponse
 import com.example.tareihan.dto.dumas.dumas
+import com.example.tareihan.dto.dumas.update_audit_disposisi
+import com.example.tareihan.dto.dumas.update_disposisi_request
+import com.example.tareihan.dto.dumas.update_status_request
 import com.example.tareihanh.dto.retrofit_interface.ApiService
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.io.File
-import java.io.FileOutputStream
+import java.io.IOException
 
 class DumasViewModel(
     private val apiService: ApiService,
@@ -88,133 +89,71 @@ class DumasViewModel(
 
     fun postDumas(dumas: dumas, fileUri: Uri?) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
-
             try {
-                // Validate required fields first
-                if (isAnyFieldEmpty(dumas)) {
-                    errorMessage = "Semua field wajib diisi!"
-                    isLoading = false
-                    return@launch
+                // Prepare RequestBody for each field
+                val judul = dumas.judul.toRequestBody("text/plain".toMediaTypeOrNull())
+                val isiPengaduan = dumas.isi_pengaduan.toRequestBody("text/plain".toMediaTypeOrNull())
+                val namaPengadu = dumas.nama_pengadu.toRequestBody("text/plain".toMediaTypeOrNull())
+                val nomorhpPengadu = dumas.nomorhp_pengadu.toRequestBody("text/plain".toMediaTypeOrNull())
+                val emailPengadu = dumas.email_pengadu.toRequestBody("text/plain".toMediaTypeOrNull())
+                val keterangan = dumas.keterangan.toRequestBody("text/plain".toMediaTypeOrNull())
+                val createdBy = dumas.created_by.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                // Prepare file part if available
+                val filePart: MultipartBody.Part? = fileUri?.let { uri ->
+                    createFilePart(uri)
                 }
 
-                // Prepare individual form data fields (handle nullable values)
-                val judulPart = (dumas.judul ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val isiPengaduanPart = (dumas.isi_pengaduan ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val namaPengaduPart = (dumas.nama_pengadu ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val nomorhpPengaduPart = (dumas.nomorhp_pengadu ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val emailPengaduPart = (dumas.email_pengadu ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val verifikasiByPart = (dumas.verifikasi_by ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val verifikasiAtPart = (dumas.verifikasi_at ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val disposisiByPart = (dumas.disposisi_by ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val disposisiToPart = (dumas.disposisi_to ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val disposisiAtPart = (dumas.disposisi_at ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val tanggalAuditPart = (dumas.tanggal_audit ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val nilaiAuditPart = (dumas.nilai_audit ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val keteranganPart = (dumas.keterangan ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-                val createdByPart = (dumas.created_by ?: "").toRequestBody("text/plain".toMediaTypeOrNull())
-
-                // Prepare the file part for the multipart request
-                val filePart = fileUri?.let { uri ->
-                    try {
-                        val file = createTempFileFromUri(uri)
-                        val requestFile = file.asRequestBody(getMimeType(file.name).toMediaTypeOrNull())
-                        MultipartBody.Part.createFormData("file", file.name, requestFile)
-                    } catch (e: Exception) {
-                        errorMessage = "Error processing file: ${e.message}"
-                        null
-                    }
-                }
-
-                // Call the API with individual form fields - sesuai dengan interface API
-                val response: Response<DataResponse<Unit>> = apiService.post_dumas(
-                    judul = judulPart,
-                    isiPengaduan = isiPengaduanPart,
-                    namaPengadu = namaPengaduPart,
-                    nomorhpPengadu = nomorhpPengaduPart,
-                    emailPengadu = emailPengaduPart,
-                    verifikasiBy = verifikasiByPart,
-                    verifikasiAt = verifikasiAtPart,
-                    disposisiBy = disposisiByPart,
-                    disposisiTo = disposisiToPart,
-                    disposisiAt = disposisiAtPart,
-                    tanggalAudit = tanggalAuditPart,
-                    nilaiAudit = nilaiAuditPart,
-                    keterangan = keteranganPart,
-                    createdBy = createdByPart,
-                    file = filePart // Nullable sesuai dengan API interface
+                // Make API call
+                val response = apiService.post_dumas(
+                    judul = judul,
+                    isiPengaduan = isiPengaduan,
+                    namaPengadu = namaPengadu,
+                    nomorhpPengadu = nomorhpPengadu,
+                    emailPengadu = emailPengadu,
+                    keterangan = keterangan,
+                    createdBy = createdBy,
+                    file = filePart
                 )
 
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null && body.success) {
-                        getDumas() // Refresh the data after successful submission
-                        isSuccess = true
-                        errorMessage = null
-                    } else {
-                        isSuccess = false
-                        errorMessage = body?.message ?: "Gagal menambahkan data"
-                    }
+                    isSuccess = true
+                    errorMessage = null
                 } else {
                     isSuccess = false
-                    errorMessage = "Gagal menambahkan data: ${response.code()} - ${response.message()}"
-
-                    // Try to get more detailed error from response body
-                    response.errorBody()?.string()?.let { errorBody ->
-                        errorMessage = "$errorMessage - $errorBody"
-                    }
+                    errorMessage = "Failed to submit dumas: ${response.message()}"
                 }
             } catch (e: Exception) {
-                errorMessage = e.localizedMessage ?: "Terjadi kesalahan saat menambahkan data."
-                e.printStackTrace()
                 isSuccess = false
-            } finally {
-                isLoading = false
+                errorMessage = "Error: ${e.message}"
             }
         }
     }
-
-    // Helper function to validate if any required field is empty
-    private fun isAnyFieldEmpty(dumas: dumas): Boolean {
-        return dumas.judul.isNullOrBlank() ||
-                dumas.isi_pengaduan.isNullOrBlank() ||
-                dumas.nama_pengadu.isNullOrBlank() ||
-                dumas.nomorhp_pengadu.isNullOrBlank() ||
-                dumas.email_pengadu.isNullOrBlank() ||
-                dumas.verifikasi_by.isNullOrBlank() ||
-                dumas.verifikasi_at.isNullOrBlank() ||
-                dumas.disposisi_by.isNullOrBlank() ||
-                dumas.disposisi_to.isNullOrBlank() ||
-                dumas.disposisi_at.isNullOrBlank() ||
-                dumas.tanggal_audit.isNullOrBlank() ||
-                dumas.nilai_audit.isNullOrBlank() ||
-                dumas.keterangan.isNullOrBlank() ||
-                dumas.created_by.isNullOrBlank()
-    }
-
     // Helper function to create a temporary file from a Uri
-    private fun createTempFileFromUri(uri: Uri): File {
-        val tempFile = File.createTempFile("upload_", ".tmp", context.cacheDir)
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            FileOutputStream(tempFile).use { outputStream ->
-                inputStream.copyTo(outputStream)
+    private fun createFilePart(uri: Uri): MultipartBody.Part? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val fileBytes = inputStream.readBytes()
+                val fileName = getFileName(uri)
+
+                val fileRequestBody = fileBytes.toRequestBody("*/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("file", fileName, fileRequestBody)
             }
+        } catch (e: IOException) {
+            errorMessage = "Failed to read file: ${e.message}"
+            null
         }
-        return tempFile
     }
 
-    // Helper function to get MIME type from file extension
-    private fun getMimeType(fileName: String): String {
-        return when (fileName.substringAfterLast('.', "").lowercase()) {
-            "pdf" -> "application/pdf"
-            "doc" -> "application/msword"
-            "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            "jpg", "jpeg" -> "image/jpeg"
-            "png" -> "image/png"
-            "txt" -> "text/plain"
-            else -> "application/octet-stream"
-        }
+    private fun getFileName(uri: Uri): String {
+        return context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1 && cursor.moveToFirst()) {
+                cursor.getString(nameIndex)
+            } else {
+                "file_${System.currentTimeMillis()}"
+            }
+        } ?: "file_${System.currentTimeMillis()}"
     }
 
     fun putDumas(id: Int, dumas: dumas) {
@@ -283,5 +222,88 @@ class DumasViewModel(
     fun resetSuccessState() {
         isSuccess = false
         errorMessage = null
+    }
+
+    fun update_status_dumas(id:Int,status:String){
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            try {
+                val updateStatusRequest = update_status_request(
+                    status = status,
+                )
+                val response: Response<DataResponse<Unit>> = apiService.update_status_dumas(id,updateStatusRequest)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null && body.success) {
+                        getDumas()
+                    } else {
+                        errorMessage = body?.message ?: "Gagal menghapus data"
+                    }
+                } else {
+                    errorMessage = "Gagal menghapus data: ${response.code()} - ${response.message()}"
+                    response.errorBody()?.string()?.let { errorBody ->
+                        errorMessage = "$errorMessage - $errorBody"
+                    }
+                }
+            }catch (e:Exception){
+                errorMessage = "Terjadi kesalahan saat menghapus data."
+                e.printStackTrace()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun update_disposisi(id: Int, updateDisposisiRequest: update_disposisi_request){
+        viewModelScope.launch {
+            try {
+                val response: Response<DataResponse<Unit>> = apiService.update_disposisi(id,updateDisposisiRequest)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null && body.success) {
+                        getDumas()
+                    } else {
+                        errorMessage = body?.message ?: "Gagal menghapus data"
+                    }
+                } else {
+                    errorMessage = "Gagal menghapus data: ${response.code()} - ${response.message()}"
+                    response.errorBody()?.string()?.let { errorBody ->
+                        errorMessage = "$errorMessage - $errorBody"
+                    }
+                }
+            }catch (e:Exception){
+                errorMessage = "Terjadi kesalahan saat menghapus data."
+                e.printStackTrace()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun update_disposisi_audit(id: Int, updateAuditDisposisi: update_audit_disposisi){
+        viewModelScope.launch {
+            try {
+                val response: Response<DataResponse<Unit>> = apiService.update_disposisi_audit(id,updateAuditDisposisi)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null && body.success) {
+                        getDumas()
+                    } else {
+                        errorMessage = body?.message ?: "Gagal menghapus data"
+                    }
+                } else {
+                    errorMessage = "Gagal menghapus data: ${response.code()} - ${response.message()}"
+                    response.errorBody()?.string()?.let { errorBody ->
+                        errorMessage = "$errorMessage - $errorBody"
+                    }
+                }
+            }catch (e:Exception){
+                errorMessage = "Terjadi kesalahan saat menghapus data."
+                e.printStackTrace()
+            } finally {
+                isLoading = false
+            }
+        }
     }
 }

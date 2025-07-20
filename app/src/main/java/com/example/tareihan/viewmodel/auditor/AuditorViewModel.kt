@@ -7,13 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tareihan.dto.apiresponse.DataResponse
 import com.example.tareihan.dto.auditor.Auditor
+import com.example.tareihan.dto.auditor.auditor_response
 import com.example.tareihanh.dto.retrofit_interface.ApiService
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class AuditorViewModel(private val apiService: ApiService): ViewModel() {
     var auditor by mutableStateOf<Auditor?>(null)
-    var auditorList by mutableStateOf<List<Auditor>>(emptyList())
+    var auditorList by mutableStateOf<List<auditor_response>>(emptyList())
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
     var isUpdateSuccess by mutableStateOf(false)
@@ -24,7 +25,7 @@ class AuditorViewModel(private val apiService: ApiService): ViewModel() {
             errorMessage = null
 
             try {
-                val response: Response<DataResponse<List<Auditor>>> = apiService.get_auditor()
+                val response: Response<DataResponse<List<auditor_response>>> = apiService.get_auditor()
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null && body.data != null) {

@@ -104,7 +104,7 @@ fun ListTemuanScreen(
                     navController.navigate(routes.create_temuan)
                 }
             ) {
-                Text("Create Auditor")
+                Text("Create Temuan")
             }
             when {
                 isLoading -> {
